@@ -1,0 +1,68 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Currency Converter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="card">
+    <header class="card-header">
+      <h1>Currency Converter</h1>
+      <p class="subtitle">Convert amounts between currencies (API-ready)</p>
+    </header>
+
+    <form id="converterForm" class="converter">
+      <div class="row">
+        <label for="amount">Amount</label>
+        <input id="amount" type="number" step="any" min="0" placeholder="Enter amount" required />
+      </div>
+
+      <div class="row grid-2">
+        <div>
+          <label for="fromCurr">From</label>
+          <select id="fromCurr" aria-label="From currency">
+            <!-- populate with JS / API list -->
+           <!-- <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option> -->
+          </select>
+        </div>
+
+        <div>
+          <label for="toCurr">To</label>
+          <select id="toCurr" aria-label="To currency">
+            <!-- populate with JS / API list -->
+           <!-- <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option> -->
+          </select>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="swapBtn" class="btn secondary" title="Swap currencies">⇄ Swap</button>
+        <button type="submit" id="convertBtn" class="btn primary">Convert</button>
+      </div>
+    </form>
+
+    <div class="output">
+      <div id="loader" class="loader hidden" aria-hidden="true"></div>
+
+      <div id="rateInfo" class="rate">Exchange rate: —</div>
+      <div id="result" class="result">Result: —</div>
+      <div id="error" class="error hidden">Error: Could not fetch rate</div>
+    </div>
+
+    <footer class="card-footer">
+      <small>Tip: Click Swap to reverse currencies. Rates from your chosen API.</small>
+    </footer>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

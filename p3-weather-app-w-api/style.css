@@ -61,6 +61,11 @@ body {
     background-color: #f0f0f0;
 }
 
+.search-btn.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 .loader {
     width: 40px;
     height: 40px;
@@ -111,4 +116,122 @@ body {
     justify-content: space-around;
     margin-top: 10px;
     font-size: 14px;
+}
+
+.forecast {
+    margin-top: 20px;
+    padding: 10px 0;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+}
+
+.day-card {
+    min-width: 120px;
+    background: #ffffff22;
+    padding: 12px;
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    text-align: center;
+    transition: 0.3s;
+}
+
+.day-card:hover {
+    transform: translateY(-4px);
+}
+
+.day-name {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.temp {
+    font-size: 1rem;
+    margin-top: 4px;
+}
+
+.forecast.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.forecast {
+    opacity: 1;
+    transition: 0.4s;
+}
+
+/* ---------- UNIVERSAL BACKGROUND WRAPPER ---------- */
+body {
+    position: relative;
+    overflow: hidden;
+    transition: background 1s ease-in-out;
+}
+
+/* ---------- CLOUDS (MOVING) ---------- */
+.clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background: url('https://i.imgur.com/O7pO5Dd.png') repeat-x;
+    opacity: 0;
+    animation: moveClouds 60s linear infinite;
+    pointer-events: none;
+    transition: 1s ease-in-out;
+}
+
+@keyframes moveClouds {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* ---------- RAIN ---------- */
+.rain {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background-image: url('https://i.imgur.com/7R6FZVJ.png');
+    animation: rainAnim 0.4s linear infinite;
+    opacity: 0;
+    transition: 1s;
+}
+
+@keyframes rainAnim {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+}
+
+/* ---------- SNOW ---------- */
+.snow {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background-image: url('https://i.imgur.com/fL3B2fT.png');
+    animation: snowAnim 8s linear infinite;
+    opacity: 0;
+    transition: 1s;
+}
+
+@keyframes snowAnim {
+    from { background-position: 0 0; }
+    to { background-position: 0 200%; }
+}
+
+/* ---------- FOG ---------- */
+.fog {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: url('https://i.imgur.com/53k8yUs.png');
+    background-size: cover;
+    animation: fogAnim 12s ease-in-out infinite;
+    opacity: 0;
+    transition: 1s;
+}
+
+@keyframes fogAnim {
+    0% { opacity: 0.25; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.25; }
 }

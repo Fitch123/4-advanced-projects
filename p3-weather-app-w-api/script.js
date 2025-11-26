@@ -13,6 +13,87 @@ const wind = document.getElementById("wind");
 
 const forecast = document.querySelector(".forecast");
 
+// MAIN FUNCTION
+async function displayWeather(city, showLoader = true) {
+    const apiKey = '4ff00d5f1b7549ccbd4231450251911';
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no`;
+
+    const weatherContainer =  document.querySelector(".weather-form");
+    const loader = document.querySelector(".loader");
+    const weatherBox = document.querySelector(".weather-box");
+    const errorMsg = document.querySelector(".error");
+    const forecast = document.querySelector(".forecast");
+
+    if (!city) {
+        errorMessage.textContent = "Please enter a city name.";
+        document.querySelector(".error").classList.remove("hidden");
+        return;
+    }
+
+    errorMsg.classList.add("hidden");
+    errorMessage.textContent = "";
+
+    if (showLoader) {
+        weatherContainer.classList.add("hidden");
+        loader.classList.remove("hidden")
+    }
+    
+    document.querySelector(".search-btn").classList.add("loading");
+
+    // Reset day cards
+    forecastContainer.textContent = "";
+
+    // API fetching 
+    try {
+        // Make a fetch request to WeatherAPI
+        const response = await fetch(url);
+        // Convert the response to JSON
+        const data = await response.json();
+
+        //console.log(data);
+
+        changeBackground(data.current.condition.code, data.current.is_day);
+
+        // Update the UI With the Weather Data
+        cityName.textContent = `${data.location.name} / ${data.location.country}`;
+        weatherIcon.src = data.current.condition.icon;
+        temperature.textContent = `${data.current.temp_c}°C`;
+        description.textContent = data.current.condition.text;
+        humidity.textContent = `Humidity: ${data.current.humidity}%`;
+        feelsLike.textContent = `Feels: ${data.current.feelslike_c}°C`;
+        wind.textContent = `Wind: ${data.current.wind_kph} km/h`;
+
+        // Display weather box
+        weatherBox.classList.remove("hidden");
+
+        // Hide spinner
+        loader.classList.add("hidden");
+
+        // Display weather container
+        weatherContainer.classList.remove("hidden");
+
+        // Show forecast
+        data.forecast.forecastday.forEach(day => {
+            renderDayCard(day);
+        });
+
+        //Display forecast div
+        forecast.classList.remove("hidden");
+
+    } catch (error) {
+        console.log("Error:", error);
+        weatherContainer.classList.remove("hidden");
+        loader.classList.add("hidden");
+        errorMsg.classList.remove("hidden");
+        errorMsg.textContent = "City not found 😢";
+    }
+
+    document.querySelector(".search-btn").classList.remove("loading");
+
+    cityInput.value = "";
+}
+
+
 // HELPER FUNCTIONS
 function changeBackground(code, isDay) {
     const clouds = document.querySelector(".clouds");
@@ -106,113 +187,62 @@ function renderDayCard(dayArray) {
     dayCard.classList.add("day-card");
     forecast.appendChild(dayCard);
 
+    // Date Information
     const dateInfo = document.createElement("p"); 
     dateInfo.classList.add("day-name");
     let chooseDay = (date === formattedDate) ? "Today" : weekDay;
     dateInfo.textContent = chooseDay;
     dayCard.appendChild(dateInfo);
 
+    // Temperature Information
     const tempInfo = document.createElement("p"); 
     tempInfo.classList.add("temp");
     tempInfo.textContent = `${maxTemp}° / ${minTemp}°`;
     dayCard.appendChild(tempInfo);
 
+    // Icon logo
     const newIcon = document.createElement("img");
     newIcon.src = icon;
     dayCard.appendChild(newIcon);
 
+    // Text Information
     const textInfo = document.createElement("p");
     textInfo.classList.add("text");
     textInfo.textContent = text;
     dayCard.appendChild(textInfo);
 }
 
+function saveCityToHistory(city) {
+    // Normalize inside the same function
+    city = city.trim().toLowerCase();
 
-// MAIN FUNCTION
-async function displayWeather(city, showLoader = true) {
-    const apiKey = '4ff00d5f1b7549ccbd4231450251911';
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no`;
+    // Get history or empty array
+    let history = JSON.parse(localStorage.getItem("history")) || [];
 
-    const weatherContainer =  document.querySelector(".weather-form");
-    const loader = document.querySelector(".loader");
-    const weatherBox = document.querySelector(".weather-box");
-    const errorMsg = document.querySelector(".error");
-    const forecast = document.querySelector(".forecast");
+    // Remove duplicates
+    history = history.filter(c => c !== city);
 
-    if (!city) {
-        errorMessage.textContent = "Please enter a city name.";
-        document.querySelector(".error").classList.remove("hidden");
-        return;
-    }
+    // Add new city to front
+    history.unshift(city);
+  
+    // Limit to last 5
+    history = history.slice(0, 5);
 
-    errorMsg.classList.add("hidden");
-    errorMessage.textContent = "";
+    // Save
+    localStorage.setItem("history", JSON.stringify(history));
 
-    if (showLoader) {
-        weatherContainer.classList.add("hidden");
-        loader.classList.remove("hidden")
-    }
-    
-    document.querySelector(".search-btn").classList.add("loading");
-
-    // Reset day cards
-    forecastContainer.textContent = "";
-
-    // API fetching 
-    try {
-        // Make a fetch request to WeatherAPI
-        const response = await fetch(url);
-        // Convert the response to JSON
-        const data = await response.json();
-
-        //console.log(data);
-
-        changeBackground(data.current.condition.code, data.current.is_day);
-
-        // Update the UI With the Weather Data
-        cityName.textContent = `${data.location.name} / ${data.location.region}`;
-        weatherIcon.src = data.current.condition.icon;
-        temperature.textContent = `${data.current.temp_c}°C`;
-        description.textContent = data.current.condition.text;
-        humidity.textContent = `Humidity: ${data.current.humidity}%`;
-        feelsLike.textContent = `Feels: ${data.current.feelslike_c}°C`;
-        wind.textContent = `Wind: ${data.current.wind_kph} km/h`;
-
-        // Display weather box
-        weatherBox.classList.remove("hidden");
-
-        // Hide spinner
-        loader.classList.add("hidden");
-
-        // Display weather container
-        weatherContainer.classList.remove("hidden");
-
-        // Show forecast
-        data.forecast.forecastday.forEach(day => {
-            renderDayCard(day);
-        });
-
-        //Display forecast div
-        forecast.classList.remove("hidden");
-
-    } catch (error) {
-        console.log("Error:", error);
-        weatherContainer.classList.remove("hidden");
-        loader.classList.add("hidden");
-        errorMsg.classList.remove("hidden");
-        errorMsg.textContent = "City not found 😢";
-    }
-
-    document.querySelector(".search-btn").classList.remove("loading");
-
-    cityInput.value = "";
+    console.log(history);
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    displayWeather("Rosarito", false);
-});
+function renderCityButtons() {
+    
+}
 
+
+/*document.addEventListener("DOMContentLoaded", () => {
+    displayWeather("Rosarito", false);
+});*/
 
 cityInput.addEventListener("keyup", (e) => {
     if (e.key === "Enter") weatherForm.requestSubmit();
@@ -221,4 +251,5 @@ cityInput.addEventListener("keyup", (e) => {
 weatherForm.addEventListener("submit", (event) => {
     event.preventDefault();
     displayWeather(cityInput.value);
+    saveCityToHistory(cityInput.value)
 });

@@ -28,10 +28,15 @@
             <button class="search-btn" type="submit">Search</button>
         </form>
 
-        <div class="loader hidden">
-            <p id="errorMessage"></p>
+        <div class="historyContainer">
+            <button id="historyToggle">Search History ▼</button>
+            <ul id="historyList" class="collapsed"></ul>
         </div>
 
+        <div class="loader hidden">
+
+            <p id="errorMessage"></p>
+        </div>
         <p id="errorMessage" class="error hidden"></p>
 
         <div id="weatherBox" class="weather-box hidden">

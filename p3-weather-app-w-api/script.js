@@ -2,6 +2,8 @@ const weatherForm = document.getElementById("weatherForm");
 const cityInput = document.getElementById("cityInput");
 const errorMessage = document.getElementById("errorMessage");
 const forecastContainer = document.getElementById("forecastContainer");
+const historyToggle = document.getElementById("historyToggle");
+const historyList = document.getElementById("historyList");
 
 const cityName = document.getElementById("cityName");
 const weatherIcon = document.getElementById("weatherIcon");
@@ -12,6 +14,7 @@ const feelsLike = document.getElementById("feelsLike");
 const wind = document.getElementById("wind");
 
 const forecast = document.querySelector(".forecast");
+const historyContainer = document.querySelector(".historyContainer")
 
 // MAIN FUNCTION
 async function displayWeather(city, showLoader = true) {
@@ -92,7 +95,6 @@ async function displayWeather(city, showLoader = true) {
 
     cityInput.value = "";
 }
-
 
 // HELPER FUNCTIONS
 function changeBackground(code, isDay) {
@@ -231,25 +233,64 @@ function saveCityToHistory(city) {
     // Save
     localStorage.setItem("history", JSON.stringify(history));
 
+    historyContainer.classList.remove("hidden");
+
     console.log(history);
 }
 
-
 function renderCityButtons() {
-    
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+
+    historyList.innerHTML = "";
+    history.forEach(city => {
+        const newCity = document.createElement("li");
+        newCity.classList.add("history");
+        newCity.textContent = formatCityName(city);
+        newCity.onclick = () => displayWeather(city);
+        historyList.appendChild(newCity);
+    });
+}
+
+function formatCityName(city) {
+    return city.charAt(0).toUpperCase() + city.slice(1);
+}
+
+function loadSavedCity() {
+    let savedHistory = JSON.parse(localStorage.getItem("history"));
+    if(savedHistory && savedHistory.length > 0) {
+        historyContainer.classList.remove("hidden");
+        displayWeather(savedHistory[0]);
+    } else {
+        historyContainer.classList.add("hidden");
+        displayWeather("Rosarito");
+    }
 }
 
 
-/*document.addEventListener("DOMContentLoaded", () => {
-    displayWeather("Rosarito", false);
-});*/
+// EVENT HANDLERS
+document.addEventListener("DOMContentLoaded", () => {
+    renderCityButtons();
+    //displayWeather("Rosarito", false);
+    loadSavedCity();
+});
 
 cityInput.addEventListener("keyup", (e) => {
     if (e.key === "Enter") weatherForm.requestSubmit();
+});
+
+historyToggle.addEventListener("click", () => {
+    historyList.classList.toggle("open");
+
+    if (historyList.classList.contains("open")) {
+        historyToggle.textContent = "Search History ▲"; // opened
+    } else {
+        historyToggle.textContent = "Search History ▼"; // closed
+    }
 });
 
 weatherForm.addEventListener("submit", (event) => {
     event.preventDefault();
     displayWeather(cityInput.value);
     saveCityToHistory(cityInput.value)
+    renderCityButtons();
 });

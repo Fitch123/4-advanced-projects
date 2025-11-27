@@ -17,9 +17,15 @@ const forecast = document.querySelector(".forecast");
 const historyContainer = document.querySelector(".historyContainer")
 
 // MAIN FUNCTION
-async function displayWeather(city, showLoader = true) {
+async function displayWeather(city, lat, lon, showLoader = true) {
     const apiKey = '4ff00d5f1b7549ccbd4231450251911';
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7&aqi=no`;
+
+    let query = city; 
+    if (lat && lon) {
+        query = `${lat},${lon}`;
+    }
+
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${query}&days=7&aqi=no`;
 
     const weatherContainer =  document.querySelector(".weather-form");
     const loader = document.querySelector(".loader");
@@ -27,7 +33,7 @@ async function displayWeather(city, showLoader = true) {
     const errorMsg = document.querySelector(".error");
     const forecast = document.querySelector(".forecast");
 
-    if (!city) {
+    if (!city && !lat && !lon) {
         errorMessage.textContent = "Please enter a city name.";
         document.querySelector(".error").classList.remove("hidden");
         return;
@@ -53,7 +59,9 @@ async function displayWeather(city, showLoader = true) {
         // Convert the response to JSON
         const data = await response.json();
 
-        //console.log(data);
+        console.log(data);
+        console.log(data.location.lat)
+        console.log(data.location.lon)
 
         changeBackground(data.current.condition.code, data.current.is_day);
 
@@ -91,6 +99,7 @@ async function displayWeather(city, showLoader = true) {
         errorMsg.textContent = "City not found 😢";
     }
 
+    
     document.querySelector(".search-btn").classList.remove("loading");
 
     cityInput.value = "";
@@ -234,8 +243,6 @@ function saveCityToHistory(city) {
     localStorage.setItem("history", JSON.stringify(history));
 
     historyContainer.classList.remove("hidden");
-
-    console.log(history);
 }
 
 function renderCityButtons() {
@@ -262,17 +269,49 @@ function loadSavedCity() {
         displayWeather(savedHistory[0]);
     } else {
         historyContainer.classList.add("hidden");
-        displayWeather("Rosarito");
     }
 }
 
-
+function geolocation() {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                displayWeather(null, latitude, longitude);
+            },
+            (error) => {
+                let savedHistory = JSON.parse(localStorage.getItem("history"));
+                if (savedHistory && savedHistory.length > 0) {
+                    displayWeather(savedHistory[0]);
+                } else {
+                    displayWeather("San Diego");
+                }
+            },
+            { enableHighAccuracy: true, timeout: 5000 }
+        );
+    } else {
+        // Geolocation is not available
+        let savedHistory = JSON.parse(localStorage.getItem("history"));
+        if (savedHistory && savedHistory.length > 0) {
+            displayWeather(savedHistory[0]);
+        } else {
+            displayWeather("San Diego");
+        }
+    }
+}
 // EVENT HANDLERS
+
+window.onload = () => {
+    geolocation();
+}
 document.addEventListener("DOMContentLoaded", () => {
     renderCityButtons();
-    //displayWeather("Rosarito", false);
-    loadSavedCity();
+    loadSavedCity(); 
 });
+
+window.onload = () => {
+    geolocation();
+}
 
 cityInput.addEventListener("keyup", (e) => {
     if (e.key === "Enter") weatherForm.requestSubmit();
@@ -293,4 +332,5 @@ weatherForm.addEventListener("submit", (event) => {
     displayWeather(cityInput.value);
     saveCityToHistory(cityInput.value)
     renderCityButtons();
+    historyContainer.classList.remove("hidden");
 });

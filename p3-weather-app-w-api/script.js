@@ -14,11 +14,259 @@ const feelsLike = document.getElementById("feelsLike");
 const wind = document.getElementById("wind");
 
 const forecast = document.querySelector(".forecast");
-const historyContainer = document.querySelector(".historyContainer")
+const historyContainer = document.querySelector(".historyContainer");
+const autocompleteBox = document.querySelector(".autocomplete-box");
+
+const apiKey = '4ff00d5f1b7549ccbd4231450251911';
+const countryCodes = {
+  "Afghanistan": "AF",
+  "Aland Islands": "AX",
+  "Albania": "AL",
+  "Algeria": "DZ",
+  "American Samoa": "AS",
+  "Andorra": "AD",
+  "Angola": "AO",
+  "Anguilla": "AI",
+  "Antarctica": "AQ",
+  "Antigua and Barbuda": "AG",
+  "Argentina": "AR",
+  "Armenia": "AM",
+  "Aruba": "AW",
+  "Australia": "AU",
+  "Austria": "AT",
+  "Azerbaijan": "AZ",
+  "Bahamas": "BS",
+  "Bahrain": "BH",
+  "Bangladesh": "BD",
+  "Barbados": "BB",
+  "Belarus": "BY",
+  "Belgium": "BE",
+  "Belize": "BZ",
+  "Benin": "BJ",
+  "Bermuda": "BM",
+  "Bhutan": "BT",
+  "Bolivia": "BO",
+  "Bosnia and Herzegovina": "BA",
+  "Botswana": "BW",
+  "Brazil": "BR",
+  "British Indian Ocean Territory": "IO",
+  "Brunei": "BN",
+  "Bulgaria": "BG",
+  "Burkina Faso": "BF",
+  "Burundi": "BI",
+  "Cambodia": "KH",
+  "Cameroon": "CM",
+  "Canada": "CA",
+  "Cape Verde": "CV",
+  "Caribbean Netherlands": "BQ",
+  "Cayman Islands": "KY",
+  "Central African Republic": "CF",
+  "Chad": "TD",
+  "Chile": "CL",
+  "China": "CN",
+  "Christmas Island": "CX",
+  "Cocos (Keeling) Islands": "CC",
+  "Colombia": "CO",
+  "Comoros": "KM",
+  "Cook Islands": "CK",
+  "Costa Rica": "CR",
+  "Croatia": "HR",
+  "Cuba": "CU",
+  "Curaçao": "CW",
+  "Cyprus": "CY",
+  "Czech Republic": "CZ",
+  "Democratic Republic of the Congo": "CD",
+  "Denmark": "DK",
+  "Djibouti": "DJ",
+  "Dominica": "DM",
+  "Dominican Republic": "DO",
+  "Ecuador": "EC",
+  "Egypt": "EG",
+  "El Salvador": "SV",
+  "Equatorial Guinea": "GQ",
+  "Eritrea": "ER",
+  "Estonia": "EE",
+  "Eswatini": "SZ",
+  "Ethiopia": "ET",
+  "Falkland Islands": "FK",
+  "Faroe Islands": "FO",
+  "Fiji": "FJ",
+  "Finland": "FI",
+  "France": "FR",
+  "French Guiana": "GF",
+  "French Polynesia": "PF",
+  "French Southern Territories": "TF",
+  "Gabon": "GA",
+  "Gambia": "GM",
+  "Georgia": "GE",
+  "Germany": "DE",
+  "Ghana": "GH",
+  "Gibraltar": "GI",
+  "Greece": "GR",
+  "Greenland": "GL",
+  "Grenada": "GD",
+  "Guadeloupe": "GP",
+  "Guam": "GU",
+  "Guatemala": "GT",
+  "Guernsey": "GG",
+  "Guinea": "GN",
+  "Guinea-Bissau": "GW",
+  "Guyana": "GY",
+  "Haiti": "HT",
+  "Honduras": "HN",
+  "Hong Kong": "HK",
+  "Hungary": "HU",
+  "Iceland": "IS",
+  "India": "IN",
+  "Indonesia": "ID",
+  "Iran": "IR",
+  "Iraq": "IQ",
+  "Ireland": "IE",
+  "Isle of Man": "IM",
+  "Israel": "IL",
+  "Italy": "IT",
+  "Ivory Coast": "CI",
+  "Jamaica": "JM",
+  "Japan": "JP",
+  "Jersey": "JE",
+  "Jordan": "JO",
+  "Kazakhstan": "KZ",
+  "Kenya": "KE",
+  "Kiribati": "KI",
+  "Kosovo": "XK",
+  "Kuwait": "KW",
+  "Kyrgyzstan": "KG",
+  "Laos": "LA",
+  "Latvia": "LV",
+  "Lebanon": "LB",
+  "Lesotho": "LS",
+  "Liberia": "LR",
+  "Libya": "LY",
+  "Liechtenstein": "LI",
+  "Lithuania": "LT",
+  "Luxembourg": "LU",
+  "Macau": "MO",
+  "Madagascar": "MG",
+  "Malawi": "MW",
+  "Malaysia": "MY",
+  "Maldives": "MV",
+  "Mali": "ML",
+  "Malta": "MT",
+  "Marshall Islands": "MH",
+  "Martinique": "MQ",
+  "Mauritania": "MR",
+  "Mauritius": "MU",
+  "Mayotte": "YT",
+  "Mexico": "MX",
+  "Micronesia": "FM",
+  "Moldova": "MD",
+  "Monaco": "MC",
+  "Mongolia": "MN",
+  "Montenegro": "ME",
+  "Montserrat": "MS",
+  "Morocco": "MA",
+  "Mozambique": "MZ",
+  "Myanmar (Burma)": "MM",
+  "Namibia": "NA",
+  "Nauru": "NR",
+  "Nepal": "NP",
+  "Netherlands": "NL",
+  "New Caledonia": "NC",
+  "New Zealand": "NZ",
+  "Nicaragua": "NI",
+  "Niger": "NE",
+  "Nigeria": "NG",
+  "Niue": "NU",
+  "Norfolk Island": "NF",
+  "North Korea": "KP",
+  "North Macedonia": "MK",
+  "Northern Mariana Islands": "MP",
+  "Norway": "NO",
+  "Oman": "OM",
+  "Pakistan": "PK",
+  "Palau": "PW",
+  "Palestine": "PS",
+  "Panama": "PA",
+  "Papua New Guinea": "PG",
+  "Paraguay": "PY",
+  "Peru": "PE",
+  "Philippines": "PH",
+  "Pitcairn Islands": "PN",
+  "Poland": "PL",
+  "Portugal": "PT",
+  "Puerto Rico": "PR",
+  "Qatar": "QA",
+  "Republic of the Congo": "CG",
+  "Réunion": "RE",
+  "Romania": "RO",
+  "Russia": "RU",
+  "Rwanda": "RW",
+  "Saint Barthélemy": "BL",
+  "Saint Helena": "SH",
+  "Saint Kitts and Nevis": "KN",
+  "Saint Lucia": "LC",
+  "Saint Martin": "MF",
+  "Saint Pierre and Miquelon": "PM",
+  "Samoa": "WS",
+  "San Marino": "SM",
+  "Sao Tome and Principe": "ST",
+  "Saudi Arabia": "SA",
+  "Senegal": "SN",
+  "Serbia": "RS",
+  "Seychelles": "SC",
+  "Sierra Leone": "SL",
+  "Singapore": "SG",
+  "Sint Maarten": "SX",
+  "Slovakia": "SK",
+  "Slovenia": "SI",
+  "Solomon Islands": "SB",
+  "Somalia": "SO",
+  "South Africa": "ZA",
+  "South Korea": "KR",
+  "South Sudan": "SS",
+  "Spain": "ES",
+  "Sri Lanka": "LK",
+  "Sudan": "SD",
+  "Suriname": "SR",
+  "Sweden": "SE",
+  "Switzerland": "CH",
+  "Syria": "SY",
+  "Taiwan": "TW",
+  "Tajikistan": "TJ",
+  "Tanzania": "TZ",
+  "Thailand": "TH",
+  "Timor-Leste": "TL",
+  "Togo": "TG",
+  "Tokelau": "TK",
+  "Tonga": "TO",
+  "Trinidad and Tobago": "TT",
+  "Tunisia": "TN",
+  "Turkey": "TR",
+  "Turkmenistan": "TM",
+  "Turks and Caicos Islands": "TC",
+  "Tuvalu": "TV",
+  "Uganda": "UG",
+  "Ukraine": "UA",
+  "United Arab Emirates": "AE",
+  "United Kingdom": "UK",
+  "United States of America": "US",
+  "Uruguay": "UY",
+  "Uzbekistan": "UZ",
+  "Vanuatu": "VU",
+  "Vatican City": "VA",
+  "Venezuela": "VE",
+  "Vietnam": "VN",
+  "Virgin Islands (British)": "VG",
+  "Virgin Islands (U.S.)": "VI",
+  "Wallis and Futuna": "WF",
+  "Western Sahara": "EH",
+  "Yemen": "YE",
+  "Zambia": "ZM",
+  "Zimbabwe": "ZW"
+};
 
 // MAIN FUNCTION
 async function displayWeather(city, lat, lon, showLoader = true) {
-    const apiKey = '4ff00d5f1b7549ccbd4231450251911';
 
     let query = city; 
     if (lat && lon) {
@@ -59,14 +307,14 @@ async function displayWeather(city, lat, lon, showLoader = true) {
         // Convert the response to JSON
         const data = await response.json();
 
-        console.log(data);
-        console.log(data.location.lat)
-        console.log(data.location.lon)
+        //console.log(data);   
 
         changeBackground(data.current.condition.code, data.current.is_day);
+        
+        const countryCode = countryCodes[data.location.country] || "";
 
         // Update the UI With the Weather Data
-        cityName.textContent = `${data.location.name} / ${data.location.country}`;
+        cityName.textContent = `${data.location.name}, ${data.location.region}, ${countryCode}`;
         weatherIcon.src = data.current.condition.icon;
         temperature.textContent = `${data.current.temp_c}°C`;
         description.textContent = data.current.condition.text;
@@ -104,8 +352,42 @@ async function displayWeather(city, lat, lon, showLoader = true) {
 
     cityInput.value = "";
 }
-
 // HELPER FUNCTIONS
+async function getCitySuggestions(query) {
+    const url = `https://api.weatherapi.com/v1/search.json?key=${apiKey}&q=${query}`;
+
+    try {
+        // Make a fetch request to WeatherAPI
+        const response = await fetch(url);
+        // Convert the response to JSON
+        const data = await response.json();
+
+        //console.log(data);
+
+        autocompleteBox.innerHTML = "";
+        data.forEach(c => {
+            //console.log(c.name);
+            const li = document.createElement("li");
+            li.classList.add("autocomplete-item");
+            const countryCode = countryCodes[c.country] || "";
+            li.textContent = `${c.name}, ${c.region}, ${countryCode}`;
+            li.onclick = () => {
+                const formatted = `${c.name}, ${c.region}, ${c.country}`;
+                saveCityToHistory(formatted);
+                renderCityButtons(); 
+                autocompleteBox.innerHTML = ""; 
+                autocompleteBox.classList.remove("show");
+                historyContainer.classList.remove("hidden");
+                displayWeather(c.name)
+            };
+            autocompleteBox.appendChild(li);
+            autocompleteBox.classList.add("show");
+        });
+    } catch (error) {
+        console.log("Error:", error);
+    }
+}
+
 function changeBackground(code, isDay) {
     const clouds = document.querySelector(".clouds");
     const rain = document.querySelector(".rain");
@@ -223,26 +505,21 @@ function renderDayCard(dayArray) {
     dayCard.appendChild(textInfo);
 }
 
-function saveCityToHistory(city) {
-    // Normalize inside the same function
-    city = city.trim().toLowerCase();
-
+function saveCityToHistory(formattedCity) {
     // Get history or empty array
     let history = JSON.parse(localStorage.getItem("history")) || [];
 
     // Remove duplicates
-    history = history.filter(c => c !== city);
+    history = history.filter(c => c !== formattedCity);
 
     // Add new city to front
-    history.unshift(city);
+    history.unshift(formattedCity);
   
     // Limit to last 5
     history = history.slice(0, 5);
 
     // Save
     localStorage.setItem("history", JSON.stringify(history));
-
-    historyContainer.classList.remove("hidden");
 }
 
 function renderCityButtons() {
@@ -252,14 +529,13 @@ function renderCityButtons() {
     history.forEach(city => {
         const newCity = document.createElement("li");
         newCity.classList.add("history");
-        newCity.textContent = formatCityName(city);
-        newCity.onclick = () => displayWeather(city);
+        newCity.textContent = city;
+        newCity.onclick = () => {
+        const cityName = city.split(",")[0];   // "London"
+            displayWeather(cityName.trim());
+        };
         historyList.appendChild(newCity);
     });
-}
-
-function formatCityName(city) {
-    return city.charAt(0).toUpperCase() + city.slice(1);
 }
 
 function loadSavedCity() {
@@ -299,11 +575,8 @@ function geolocation() {
         }
     }
 }
-// EVENT HANDLERS
 
-window.onload = () => {
-    geolocation();
-}
+// EVENT HANDLERS
 document.addEventListener("DOMContentLoaded", () => {
     renderCityButtons();
     loadSavedCity(); 
@@ -311,20 +584,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.onload = () => {
     geolocation();
-}
+};
 
 cityInput.addEventListener("keyup", (e) => {
     if (e.key === "Enter") weatherForm.requestSubmit();
+});
+
+document.addEventListener("click", (e) => {
+    const clickedInsideBox = autocompleteBox.contains(e.target);
+    const clickedInput = e.target.id === "cityInput";
+
+    if (!clickedInsideBox && !clickedInput) {
+        autocompleteBox.classList.remove("show");
+    } else {
+        autocompleteBox.classList.add("show");
+    }
 });
 
 historyToggle.addEventListener("click", () => {
     historyList.classList.toggle("open");
 
     if (historyList.classList.contains("open")) {
-        historyToggle.textContent = "Search History ▲"; // opened
+        historyToggle.textContent = "Recent ▲"; // opened
     } else {
-        historyToggle.textContent = "Search History ▼"; // closed
+        historyToggle.textContent = "Recent ▼"; // closed
     }
+});
+
+cityInput.addEventListener("input", (e) => {
+    getCitySuggestions(e.target.value);
 });
 
 weatherForm.addEventListener("submit", (event) => {
@@ -333,4 +621,7 @@ weatherForm.addEventListener("submit", (event) => {
     saveCityToHistory(cityInput.value)
     renderCityButtons();
     historyContainer.classList.remove("hidden");
+    autocompleteBox.innerHTML = "";
+    autocompleteBox.classList.remove("show");
 });
+

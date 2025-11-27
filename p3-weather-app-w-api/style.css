@@ -35,6 +35,7 @@ body {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+     position: relative;
 }
 
 .weather-form input {
@@ -44,6 +45,47 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
+}
+
+/* ---------- AUTOCOMPLETE ---------- */
+/* The dropdown box */
+.autocomplete-box {
+    position: absolute;
+    top: 100%;           /* directly under the input */
+    left: 0;
+    width: 100%;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;       /* hidden by default */
+}
+
+/* Each suggestion item */
+.autocomplete-item {
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s ease;
+}
+
+/* Remove last border */
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+/* Hover effect */
+.autocomplete-item:hover {
+    background: #f2f6ff;
+}
+
+/* Show box */
+.autocomplete-box.show {
+    display: block;
 }
 
 .search-btn {
@@ -90,7 +132,7 @@ body {
 
 /* List wrapper with slide animation */
 #historyList {
-    width: 50%;
+    width: 100%;
     margin: 10px auto 0 auto;
 
     /* Animation properties */
@@ -116,9 +158,6 @@ body {
     cursor: pointer;
     border: 1px solid #ccc;
 }
-
-
-
 
 .loader {
     width: 40px;

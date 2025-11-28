@@ -266,7 +266,7 @@ const countryCodes = {
 };
 
 // MAIN FUNCTION
-async function displayWeather(city, lat, lon, showLoader = true) {
+async function displayWeather(city, lat, lon, showLoader = true, saveToHistory = true) {
 
     let query = city; 
     if (lat && lon) {
@@ -322,6 +322,14 @@ async function displayWeather(city, lat, lon, showLoader = true) {
         feelsLike.textContent = `Feels: ${data.current.feelslike_c}°C`;
         wind.textContent = `Wind: ${data.current.wind_kph} km/h`;
 
+
+        if (saveToHistory && city) {
+            const formatted = `${data.location.name}, ${data.location.region}, ${countryCode}`;
+            saveCityToHistory(formatted);
+            renderCityButtons();
+            historyContainer.classList.remove("hidden");
+        }
+        
         // Display weather box
         weatherBox.classList.remove("hidden");
 
@@ -378,7 +386,7 @@ async function getCitySuggestions(query) {
                 autocompleteBox.innerHTML = ""; 
                 autocompleteBox.classList.remove("show");
                 historyContainer.classList.remove("hidden");
-                displayWeather(c.name)
+                displayWeather(formatted)
             };
             autocompleteBox.appendChild(li);
             autocompleteBox.classList.add("show");
@@ -506,11 +514,13 @@ function renderDayCard(dayArray) {
 }
 
 function saveCityToHistory(formattedCity) {
+    const cityId = formattedCity.split(",")[0].trim().toLowerCase();
+
     // Get history or empty array
     let history = JSON.parse(localStorage.getItem("history")) || [];
 
     // Remove duplicates
-    history = history.filter(c => c !== formattedCity);
+    history = history.filter(c => c.split(",")[0].trim().toLowerCase() !== cityId);
 
     // Add new city to front
     history.unshift(formattedCity);
@@ -553,7 +563,7 @@ function geolocation() {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
-                displayWeather(null, latitude, longitude);
+                displayWeather(null, latitude, longitude, true, false);
             },
             (error) => {
                 let savedHistory = JSON.parse(localStorage.getItem("history"));
@@ -612,14 +622,12 @@ historyToggle.addEventListener("click", () => {
 });
 
 cityInput.addEventListener("input", (e) => {
-    getCitySuggestions(e.target.value);
+    getCitySuggestions(e.target.value); 
 });
 
 weatherForm.addEventListener("submit", (event) => {
     event.preventDefault();
     displayWeather(cityInput.value);
-    saveCityToHistory(cityInput.value)
-    renderCityButtons();
     historyContainer.classList.remove("hidden");
     autocompleteBox.innerHTML = "";
     autocompleteBox.classList.remove("show");

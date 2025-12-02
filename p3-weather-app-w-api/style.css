@@ -25,6 +25,17 @@ body {
     backdrop-filter: blur(10px);
 }
 
+.unit {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 16px;
+}
+
+.unit_btn {
+    all: unset;
+    cursor: pointer;
+}
+
 .title {
     margin-bottom: 20px;
     font-size: 28px;
@@ -35,7 +46,7 @@ body {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-     position: relative;
+    position: relative;
 }
 
 .weather-form input {

@@ -16,6 +16,10 @@ const wind = document.getElementById("wind");
 const forecast = document.querySelector(".forecast");
 const historyContainer = document.querySelector(".historyContainer");
 const autocompleteBox = document.querySelector(".autocomplete-box");
+const unit = document.querySelector(".unit_btn")
+const celsius = document.querySelector(".c");
+const farenheit = document.querySelector(".f");
+
 
 const apiKey = '4ff00d5f1b7549ccbd4231450251911';
 const countryCodes = {
@@ -265,6 +269,10 @@ const countryCodes = {
   "Zimbabwe": "ZW"
 };
 
+let currentUnit = localStorage.getItem("unit") || "C"
+let currentWeatherData = null;
+
+
 // MAIN FUNCTION
 async function displayWeather(city, lat, lon, showLoader = true, saveToHistory = true) {
 
@@ -297,6 +305,7 @@ async function displayWeather(city, lat, lon, showLoader = true, saveToHistory =
     
     document.querySelector(".search-btn").classList.add("loading");
 
+
     // Reset day cards
     forecastContainer.textContent = "";
 
@@ -308,10 +317,14 @@ async function displayWeather(city, lat, lon, showLoader = true, saveToHistory =
         const data = await response.json();
 
         //console.log(data);   
+        currentWeatherData = data;
 
         changeBackground(data.current.condition.code, data.current.is_day);
         
         const countryCode = countryCodes[data.location.country] || "";
+
+        // Default unit 
+        celsius.style.fontWeight = "bold";
 
         // Update the UI With the Weather Data
         cityName.textContent = `${data.location.name}, ${data.location.region}, ${countryCode}`;
@@ -344,6 +357,9 @@ async function displayWeather(city, lat, lon, showLoader = true, saveToHistory =
             renderDayCard(day);
         });
 
+        // Apply F/C preference
+        updateWeatherUI(data);
+
         //Display forecast div
         forecast.classList.remove("hidden");
 
@@ -355,10 +371,10 @@ async function displayWeather(city, lat, lon, showLoader = true, saveToHistory =
         errorMsg.textContent = "City not found 😢";
     }
 
-    
     document.querySelector(".search-btn").classList.remove("loading");
 
     cityInput.value = "";
+
 }
 // HELPER FUNCTIONS
 async function getCitySuggestions(query) {
@@ -471,8 +487,8 @@ function renderDayCard(dayArray) {
     // day = data.forecast.forecastday[i]
     // Card data
     const date = dayArray.date;
-    const maxTemp = dayArray.day.maxtemp_c;
-    const minTemp = dayArray.day.mintemp_c;
+    const maxTempC = dayArray.day.maxtemp_c;
+    const minTempC = dayArray.day.mintemp_c;
     const icon = dayArray.day.condition.icon;
     const text = dayArray.day.condition.text;
 
@@ -495,11 +511,17 @@ function renderDayCard(dayArray) {
     dateInfo.textContent = chooseDay;
     dayCard.appendChild(dateInfo);
 
-    // Temperature Information
-    const tempInfo = document.createElement("p"); 
-    tempInfo.classList.add("temp");
-    tempInfo.textContent = `${maxTemp}° / ${minTemp}°`;
-    dayCard.appendChild(tempInfo);
+    // Max temp
+    const maxEl = document.createElement("p");
+    maxEl.classList.add("max");
+    maxEl.textContent = `${maxTempC}°C /`;  // default Celsius
+    dayCard.appendChild(maxEl);
+
+    // Min temp
+    const minEl = document.createElement("p");
+    minEl.classList.add("min");
+    minEl.textContent = `${minTempC}°C`;  // default Celsius
+    dayCard.appendChild(minEl);
 
     // Icon logo
     const newIcon = document.createElement("img");
@@ -511,6 +533,7 @@ function renderDayCard(dayArray) {
     textInfo.classList.add("text");
     textInfo.textContent = text;
     dayCard.appendChild(textInfo);
+    
 }
 
 function saveCityToHistory(formattedCity) {
@@ -586,6 +609,47 @@ function geolocation() {
     }
 }
 
+function updateWeatherUI(weatherData) {
+    const tempC = weatherData.current.temp_c;
+    const tempF = weatherData.current.temp_f;
+    const feelsLikeC = weatherData.current.feelslike_c;
+    const feelsLikeF = weatherData.current.feelslike_f;
+
+    const cards = document.querySelectorAll(".day-card");
+
+    if (currentUnit === "F") {
+        farenheit.style.fontWeight = "bold";
+        celsius.style.fontWeight = "normal";
+
+        temperature.textContent = `${tempF}°F`;
+        feelsLike.textContent = `Feels: ${feelsLikeF}°F`;
+
+        weatherData.forecast.forecastday.forEach((day, index) => {
+            const max = cards[index].querySelector(".max");
+            const min = cards[index].querySelector(".min");
+
+            max.textContent = `${day.day.maxtemp_f}°F /`;
+            min.textContent = `${day.day.mintemp_f}°F`;
+        });
+
+    } else {
+
+        celsius.style.fontWeight = "bold";
+        farenheit.style.fontWeight = "normal";
+
+        temperature.textContent = `${tempC}°C`;
+        feelsLike.textContent = `Feels: ${feelsLikeC}°C`;
+
+        weatherData.forecast.forecastday.forEach((day, index) => {
+            const max = cards[index].querySelector(".max");
+            const min = cards[index].querySelector(".min");
+
+            max.textContent = `${day.day.maxtemp_c}°C /`;
+            min.textContent = `${day.day.mintemp_c}°C`;
+        });
+    }
+}
+
 // EVENT HANDLERS
 document.addEventListener("DOMContentLoaded", () => {
     renderCityButtons();
@@ -595,6 +659,12 @@ document.addEventListener("DOMContentLoaded", () => {
 window.onload = () => {
     geolocation();
 };
+
+unit.addEventListener("click", () => {
+    currentUnit = currentUnit === "C" ? "F" : "C";
+    localStorage.setItem("unit", currentUnit);
+    updateWeatherUI(currentWeatherData);
+});
 
 cityInput.addEventListener("keyup", (e) => {
     if (e.key === "Enter") weatherForm.requestSubmit();

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Budget Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Budget Tracker</h1>
+
+        <div class="balance-box">
+            <h2>Your Balance</h2>
+            <p id="balance">$0</p>
+        </div>
+
+        <form id="transaction-form" class="form">
+            <input type="text" id="text" pattern="[A-Za-z\s]+" placeholder="Enter name" required />
+            <input type="number" id="amount" step="0.01" min="0" placeholder="Enter amount" required />
+            <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add Transaction</button>
+        </form>
+
+        <h3>Transactions</h3>
+        <ul id="transaction-list" class="list"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

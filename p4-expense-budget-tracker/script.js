@@ -14,9 +14,9 @@ function displayExpenses(name, amount, category) {
     const newSpan = document.createElement("span");
     const newBtn = document.createElement("button");
 
-    let numId = transactionList.children.length;
+    let id = Date.now();
 
-    newLi.id = numId;
+    newLi.id = id;
 
     newLi.classList.add("transaction");
     newBtn.classList.add("delete-btn");
@@ -36,7 +36,11 @@ function displayExpenses(name, amount, category) {
     newBtn.innerHTML = `❌`;
 
     // Store object in array
-    transactionArray.push({ id: numId, text: name, amount: Number(amount), type: category });
+    transactionArray.push({ id, 
+        text: name, 
+        amount: Number(amount), 
+        type: category 
+    });
     
     savedItems();
 
@@ -45,7 +49,6 @@ function displayExpenses(name, amount, category) {
     amountEl.value = "";
 
     updateBalance();
-        
     totalSpent();
 
     // Deletes item
@@ -122,10 +125,6 @@ function addTransactionToUI(transaction) {
     btn.addEventListener("click", () => {
         deleteTransaction(transaction.id);
     })
-
-
-    totalSpent();
-    updateBalance();
 }
 
 
@@ -143,6 +142,8 @@ function loadItems() {
         addTransactionToUI(item);
     });
 
+    updateBalance();
+    totalSpent();
 }
 
 document.addEventListener("DOMContentLoaded", loadItems);

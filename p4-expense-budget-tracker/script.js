@@ -134,7 +134,6 @@ function savedItems() {
 
 function loadItems() {
     const saved = JSON.parse(localStorage.getItem("transactions")) || [];
-    if (!saved) return;
 
     transactionArray = saved;
 ;

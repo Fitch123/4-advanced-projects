@@ -236,6 +236,11 @@ body {
   transform: scale(1.05);  
 }
 
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Quantity number */
 .qty-number {
   font-size: 0.95rem;

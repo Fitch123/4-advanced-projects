@@ -36,7 +36,7 @@ const items = [
         price: 129.99,
         image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=1472&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     }
- ];
+];
 
  let cart = [];
 
@@ -96,6 +96,7 @@ function addToCart(id, image, name, price) {
 
     updateCartBadge();
     updateMessage();
+    calculateTotal();
 }
 
 function createCartItem(id, image, name, price) {
@@ -189,6 +190,7 @@ function changeQty(id, delta) {
 
     updateCartBadge();
     updateMessage();
+    calculateTotal()
 }
 
 function updateCartBadge() {
@@ -216,6 +218,12 @@ function clearItem(id) {
 
     updateMessage();
     updateCartBadge();
+    calculateTotal()
+}
+
+function calculateTotal() {
+    const cartTotal = cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
+    total.textContent = cartTotal.toFixed(2);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

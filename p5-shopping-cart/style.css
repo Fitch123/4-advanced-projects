@@ -98,6 +98,34 @@ body {
   background: grey;
 }
 
+.cart-icon {
+  position: relative;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff3b30;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-count.hidden {
+  display: none;
+}
+
 /* ----- CART OVERLAY ----- */
 .cart-overlay {
   position: fixed;

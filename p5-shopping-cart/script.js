@@ -31,7 +31,7 @@ const items = [
         price: 29.99,
         image: "https://images.unsplash.com/photo-1582978571763-2d039e56f0c3?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
-    {id: crypto.randomUUID(), 
+    {   id: crypto.randomUUID(), 
         name: "smart watch", 
         price: 129.99,
         image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=1472&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"

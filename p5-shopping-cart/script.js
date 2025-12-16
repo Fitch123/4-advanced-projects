@@ -40,7 +40,25 @@ const items = [
 
  let cart = [];
 
+ //STORAGE
+function savedCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
 
+function loadCart() {
+    const saved = JSON.parse(localStorage.getItem("cart")) || [];
+    cart = saved;
+
+    saved.forEach(item => {
+        loadToCartUI(item);
+    });
+
+    updateCartBadge();
+    updateMessage();
+    calculateTotal();
+}
+
+//UI
 function displayProducts() {
 
     items.forEach(item => {
@@ -74,29 +92,6 @@ function displayProducts() {
             addToCart(item.id, item.image, item.name, item.price);
         });
     });
-}
-
-function addToCart(id, image, name, price) {
-
-    const existingItem = cart.find(item => item.id === id);
-
-    if (existingItem) {
-        changeQty(id, 1);
-    } else {
-        cart.push({
-        id,
-        name,
-        price,
-        image,
-        qty: 1
-        });
-
-        createCartItem(id, image, name, price);
-    }
-
-    updateCartBadge();
-    updateMessage();
-    calculateTotal();
 }
 
 function createCartItem(id, image, name, price) {
@@ -158,6 +153,94 @@ function createCartItem(id, image, name, price) {
     cartItem.appendChild(removeBtn);
 }
 
+function addToCart(id, image, name, price) {
+
+    const existingItem = cart.find(item => item.id === id);
+
+    if (existingItem) {
+        changeQty(id, 1);
+    } else {
+        cart.push({
+        id,
+        name,
+        price,
+        image,
+        qty: 1
+        });
+
+        createCartItem(id, image, name, price);
+    }
+
+    savedCart();
+    updateCartBadge();
+    updateMessage();
+    calculateTotal();
+}
+
+function loadToCartUI(item) {
+    //Cart Item
+    const cartItem = document.createElement("div");
+    cartItem.classList.add("cart-item");
+    cartItem.dataset.id = item.id;
+    cartItems.appendChild(cartItem);
+
+    const itemLeft = document.createElement("div");    
+    itemLeft.classList.add("cart-item-left");
+    cartItem.appendChild(itemLeft);
+
+    const itemImg = document.createElement("img");
+    itemImg.classList.add("cart-item-img");
+    itemImg.src = item.image; 
+    itemLeft.appendChild(itemImg);
+
+    const itemInfo = document.createElement("div");    
+    itemInfo.classList.add("cart-item-info");
+    itemLeft.appendChild(itemInfo);
+
+    const itemName = document.createElement("p");
+    itemName.classList.add("cart-item-name");
+    itemName.textContent = item.name.charAt(0).toUpperCase() + item.name.slice(1); 
+    itemInfo.appendChild(itemName);
+
+    const itemPrice = document.createElement("p");
+    itemPrice.classList.add("cart-item-price");
+    itemPrice.textContent = `$${item.price}`; 
+    itemInfo.appendChild(itemPrice);
+
+    const itemRight = document.createElement("div");
+    itemRight.classList.add("cart-item-right");
+    cartItem.appendChild(itemRight);
+
+    const qtyWrapper = document.createElement("div");
+    qtyWrapper.classList.add("cart-item-qty");
+    itemRight.appendChild(qtyWrapper);
+
+    const minusBtn = document.createElement("button");
+    minusBtn.classList.add("qty-btn", "minus");
+    minusBtn.textContent = "−";
+    minusBtn.disabled = true;
+    // disable minus button if qty === 1
+    minusBtn.disabled = item.qty === 1;
+    qtyWrapper.appendChild(minusBtn);
+
+    const qtyNumber = document.createElement("span");
+    qtyNumber.classList.add("qty-number");
+    //Cart quantity
+    qtyNumber.textContent = item.qty;
+    qtyWrapper.appendChild(qtyNumber);
+
+    const plusBtn = document.createElement("button");
+    plusBtn.classList.add("qty-btn", "plus");
+    plusBtn.textContent = "+";
+    qtyWrapper.appendChild(plusBtn);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.classList.add("remove-btn");
+    removeBtn.textContent = "✖";
+    cartItem.appendChild(removeBtn);
+}
+
+//DERIVED
 function updateMessage() {
     const sum = cart.reduce((acc, curr) => acc + curr.qty, 0);
     if (sum > 1) {
@@ -188,6 +271,7 @@ function changeQty(id, delta) {
     // disable minus button if qty === 1
     minusBtn.disabled = item.qty === 1;
 
+    savedCart();
     updateCartBadge();
     updateMessage();
     calculateTotal()
@@ -216,6 +300,7 @@ function clearItem(id) {
     const cartItem = document.querySelector(`.cart-item[data-id="${id}"]`);
     if (cartItem) cartItem.remove();
 
+    savedCart();
     updateMessage();
     updateCartBadge();
     calculateTotal()
@@ -226,8 +311,10 @@ function calculateTotal() {
     total.textContent = cartTotal.toFixed(2);
 }
 
+//EVENT HANDLERS
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
+    loadCart();
 
     cartItems.addEventListener("click", (e) => {
         const plusMinusBtn = e.target.closest(".plus, .minus");

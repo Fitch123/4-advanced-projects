@@ -300,6 +300,10 @@ body {
   border-top: 1px solid #e0e0e0;
 }
 
+.cart-total {
+  font-weight: 500;
+}
+
 .checkout-btn {
   margin-top: 1rem;
   width: 100%;

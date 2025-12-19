@@ -2,8 +2,16 @@ const searchInput = document.getElementById("search-input");
 const movieStatus = document.getElementById("status");
 const movies = document.getElementById("movies");
 
+let controller;
 
 async function renderMovies(title) {
+    // Cancel previous request
+    if (controller) {
+        controller.abort();
+    }
+
+    controller = new AbortController();
+
     const key = 'dea6420a';
     const url = `http://www.omdbapi.com/?apikey=${key}&s=${title}`;
         
@@ -12,7 +20,9 @@ async function renderMovies(title) {
     movieStatus.textContent = "Loading...";
 
     try {
-        const response  = await fetch(url);
+        const response  = await fetch(url, {
+            signal: controller.signal
+        });
         const data = await response.json();
 
         console.log(data);
@@ -22,11 +32,18 @@ async function renderMovies(title) {
             return;
         }
 
+        if (!data.Search || data.Search.length === 0) {
+            movieStatus.textContent = "No results found";
+            return;
+        }
+
         //CLEAR STATUS EVERYTIME AFTER RENDERING
         movieStatus.textContent = "";
 
         //SET FOR DUPLICATES
         const seenId = new Set();
+
+        const fragment = document.createDocumentFragment();
 
         //ITERATE THROUGH EACH MOVIE TITLE AND POSTER
         data.Search.forEach(element => {
@@ -51,27 +68,48 @@ async function renderMovies(title) {
             const h3 = document.createElement("h3");
             h3.textContent = element.Title;
 
-            movie.appendChild(img);
-            movie.appendChild(h3);
+            movie.append(img, h3);
 
-            movies.appendChild(movie);
+            fragment.appendChild(movie);
         });
-        
 
+        movies.appendChild(fragment);
+    
     } catch (error) {
-        console.log("Error:", error)
-        movieStatus.textContent = "No movies found.";
+        if (error.name === "AbortError") {
+            return; // silently ignore
+        }   
+
+        console.log("Error:", error);
+        movieStatus.textContent = "Something went wrong";
     }
 }
+
+function debounce(fn, delay = 300) {
+    let timer;
+
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    }
+}
+
+const debouncedSearch = debounce((value) => {
+    renderMovies(value);
+}, 400);
+
 
 searchInput.addEventListener("input", (e) => {
     const value = e.target.value.trim();
 
-    if (value === "") {
+    if (value.length < 3) {
         movies.textContent = "";
-        movieStatus = "";
+        movieStatus.textContent = "";
+        if (controller) controller.abort();
         return;
     }
 
-    renderMovies(value);
+    debouncedSearch(value);
 });
